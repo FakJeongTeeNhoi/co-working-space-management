@@ -18,7 +18,6 @@ type CommonResponse struct {
 	Success bool `json:"success"`
 }
 
-// success response
 func (c CommonResponse) AddInterfaces(value map[string]interface{}) map[string]interface{} {
 	var response = make(map[string]interface{})
 	response["success"] = c.Success
