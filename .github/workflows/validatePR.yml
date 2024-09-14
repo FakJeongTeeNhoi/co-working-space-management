@@ -1,0 +1,20 @@
+name: 'Check PR Title'
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  check-pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Check PR Title format'
+        if: github.event.pull_request.title != ''
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^\[FJTN-[0-9]+\]\ .+ ]]; then
+            echo "PR title does not match the required format [FJTN-XX] with small description"
+            exit 1
+          else
+            echo "PR title is valid"
+          fi
