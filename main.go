@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/FakJeongTeeNhoi/co-working-space-management/model"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,8 @@ func main() {
 
 	server.Use(cors.New(corsConfig))
 
-	api := server.Group("/api")
+	// Comment this line so it can complie
+	// api := server.Group("/api") 
 
 	// TODO: Add routes here
 
