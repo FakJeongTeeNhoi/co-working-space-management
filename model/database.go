@@ -18,7 +18,7 @@ func InitDB() {
 			" password="+os.Getenv("DB_PASSWORD")+
 			" dbname="+os.Getenv("DB_NAME")+
 			" port="+os.Getenv("DB_PORT")+
-			"TimeZone=Asia/Bangkok"), &gorm.Config{})
+			" TimeZone=Asia/Bangkok"), &gorm.Config{})
 
 	if err != nil {
 		log.Fatalln("Unable to connect to database: ", err)

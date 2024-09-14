@@ -24,7 +24,7 @@ services:
     container_name: pgadmin
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${DB_USER}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_USER}
       PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5050:80"
