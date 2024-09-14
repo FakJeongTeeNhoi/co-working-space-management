@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/FakJeongTeeNhoi/co-working-space-management/model"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -14,8 +15,8 @@ func main() {
 	}
 
 	fmt.Println("Starting server...")
-
-	// TODO: Connect to database using gorm
+	
+	model.InitDB()
 
 	server := gin.Default()
 
