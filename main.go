@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/FakJeongTeeNhoi/co-working-space-management/gRPC"
 	"github.com/FakJeongTeeNhoi/co-working-space-management/model"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -17,6 +19,10 @@ func main() {
 	fmt.Println("Starting server...")
 	
 	model.InitDB()
+	db := model.MainDB
+
+	// start the gRPC server
+	go gRPC.StartGRPCServer(db)
 
 	server := gin.Default()
 
@@ -27,8 +33,7 @@ func main() {
 
 	server.Use(cors.New(corsConfig))
 
-	api := server.Group("/api")
-
+	//api := server.Group("/api")
 	// TODO: Add routes here
 
 	err = server.Run(":3020")

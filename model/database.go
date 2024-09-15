@@ -1,10 +1,11 @@
 package model
 
 import (
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"os"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var MainDB *gorm.DB
@@ -31,7 +32,10 @@ func InitDB() {
 
 func MigrateDB() {
 	// TODO: Add models here
-	Models := []interface{}{}
+	Models := []interface{}{
+		&Space{},
+		&Room{},
+	}
 
 	err := MainDB.AutoMigrate(Models...)
 	if err != nil {

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package space;
+
+option go_package = "generated/space";
+
+// message Space {
+//   int64 space_id = 1;
+//   string name = 2;
+//   string description = 3;
+//   repeated string working_hours = 4;
+//   float location = 5;
+//   string faculty = 6;
+//   int64 floor = 7;
+//   string building = 8;
+//   string type = 9;
+//   string head_staff = 10;
+//   repeated string faculty_access_list = 11;
+//   repeated int64 staff_list = 12;
+//   repeated string room_list = 13;
+//   bool is_available = 14;
+// }
+
+message EditSpaceRequest {
+  int64 space_id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string working_hours = 4;
+  float latitude = 5;
+  float longitude = 6;
+  string faculty = 7;
+  int64 floor = 8;
+  string building = 9;
+  string type = 10;
+  string head_staff = 11;
+  repeated string faculty_access_list = 12;
+  repeated string room_list = 13;
+  bool is_available = 14;
+}
+
+message SpaceServiceResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message DeleteSpaceRequest {
+  int64 space_id = 1;
+}
+
+service SpaceService {
+  rpc EditSpaceDetail(EditSpaceRequest) returns (SpaceServiceResponse);
+  rpc DeleteSpace(DeleteSpaceRequest) returns (SpaceServiceResponse);
+}
