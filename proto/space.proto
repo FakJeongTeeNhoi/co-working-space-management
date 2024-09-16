@@ -4,23 +4,6 @@ package space;
 
 option go_package = "generated/space";
 
-// message Space {
-//   int64 space_id = 1;
-//   string name = 2;
-//   string description = 3;
-//   repeated string working_hours = 4;
-//   float location = 5;
-//   string faculty = 6;
-//   int64 floor = 7;
-//   string building = 8;
-//   string type = 9;
-//   string head_staff = 10;
-//   repeated string faculty_access_list = 11;
-//   repeated int64 staff_list = 12;
-//   repeated string room_list = 13;
-//   bool is_available = 14;
-// }
-
 message EditSpaceRequest {
   int64 space_id = 1;
   string name = 2;

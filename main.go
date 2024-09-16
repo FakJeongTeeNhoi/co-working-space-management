@@ -17,12 +17,11 @@ func main() {
 	}
 
 	fmt.Println("Starting server...")
-	
+
 	model.InitDB()
-	db := model.MainDB
 
 	// start the gRPC server
-	go gRPC.StartGRPCServer(db)
+	go gRPC.StartGRPCServer(model.MainDB)
 
 	server := gin.Default()
 
