@@ -21,6 +21,28 @@ message EditSpaceRequest {
   bool is_available = 14;
 }
 
+message GetSpaceRequest {
+  int64 space_id = 1;
+}
+
+message GetSpaceResponse {
+  bool success = 1;
+  int64 space_id = 2;
+  string name = 3;
+  string description = 4;
+  repeated string working_hours = 5;
+  float latitude = 6;
+  float longitude = 7;
+  string faculty = 8;
+  int64 floor = 9;
+  string building = 10;
+  string type = 11;
+  string head_staff = 12;
+  repeated string faculty_access_list = 13;
+  repeated string room_list = 14;
+  bool is_available = 15;
+}
+
 message SpaceServiceResponse {
   bool success = 1;
   string message = 2;
@@ -33,4 +55,5 @@ message DeleteSpaceRequest {
 service SpaceService {
   rpc EditSpaceDetail(EditSpaceRequest) returns (SpaceServiceResponse);
   rpc DeleteSpace(DeleteSpaceRequest) returns (SpaceServiceResponse);
+  rpc GetSpace(GetSpaceRequest) returns (GetSpaceResponse);
 }

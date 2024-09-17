@@ -49,3 +49,31 @@ func (s *SpaceServer) DeleteSpace(ctx context.Context, req *pb.DeleteSpaceReques
 
 	return &pb.SpaceServiceResponse{Success: true, Message: "Co-Working Space deleted successfully"}, nil
 }
+
+func (s *SpaceServer) GetSpace(ctx context.Context, req *pb.GetSpaceRequest) (*pb.GetSpaceResponse, error) {
+	var space model.Space
+	if err := s.db.First(&space, req.SpaceId).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &pb.GetSpaceResponse{Success: false}, nil
+		}
+		return nil, err
+	}
+
+	return &pb.GetSpaceResponse{
+		Success: true,
+		SpaceId: int64(space.ID),  // Include space_id in the response
+		Name: space.Name,
+		Description: space.Description,
+		WorkingHours: space.WorkingHour,
+		Latitude: float32(space.Latitude),
+		Longitude: float32(space.Longitude),
+		Faculty: space.Faculty,
+		Floor: int64(space.Floor),
+		Building: space.Building,
+		Type: space.Type,
+		HeadStaff: space.HeadStaff,
+		FacultyAccessList: space.FacultyAccessList,
+		RoomList: space.RoomList,
+		IsAvailable: space.IsAvailable,
+	}, nil
+}
