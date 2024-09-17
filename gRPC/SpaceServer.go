@@ -105,6 +105,7 @@ func (s *SpaceServer) GetAllSpace(ctx context.Context, req *pb.GetAllSpaceReques
     var pbSpaces []*pb.Space
     for _, space := range spaces {
         pbSpace := &pb.Space{
+			SpaceId: 		   int64(space.ID),
             Name:              space.Name,
             Description:       space.Description,
             WorkingHours:      space.WorkingHour,
