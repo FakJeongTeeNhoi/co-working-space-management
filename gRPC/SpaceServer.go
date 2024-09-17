@@ -3,7 +3,6 @@ package gRPC
 import (
 	"context"
 	"errors"
-	"log"
 
 	pb "github.com/FakJeongTeeNhoi/co-working-space-management/generated/space"
 	"github.com/FakJeongTeeNhoi/co-working-space-management/model"
@@ -78,11 +77,7 @@ func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceReques
 	space.RoomList = req.RoomList
 	space.IsAvailable = req.IsAvailable
 
-	// Log creation attempt
-	log.Printf("Attempting to create space: %v", space)
-
 	if err := s.db.Create(&space).Error; err != nil {
-		log.Printf("Failed to create space: %v", err)
 		return &pb.GetSpaceResponse{Success: false}, err
 	}
 
