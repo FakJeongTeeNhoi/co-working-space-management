@@ -4,6 +4,30 @@ package space;
 
 option go_package = "generated/space";
 
+message CreateSpaceRequest {
+  string name = 1;
+  string description = 2;
+  repeated string working_hours = 3;
+  float latitude = 4;
+  float longitude = 5;
+  string faculty = 6;
+  int64 floor = 7;
+  string building = 8;
+  string type = 9;
+  string head_staff = 10;
+  repeated string faculty_access_list = 11;
+  repeated string room_list = 12;
+  bool is_available = 13;
+}
+
+message GetAllSpaceRequest {}
+
+message GetAllSpaceResponse {
+  bool success = 1;
+  string message = 2;
+  repeated Space spaces = 3;
+}
+
 message EditSpaceRequest {
   int64 space_id = 1;
   string name = 2;
@@ -53,6 +77,8 @@ message DeleteSpaceRequest {
 }
 
 service SpaceService {
+  rpc CreateSpace(CreateSpaceRequest) returns (SpaceServiceResponse);
+  rpc GetAllSpace(GetAllSpaceRequest) returns (GetAllSpaceResponse);
   rpc EditSpaceDetail(EditSpaceRequest) returns (SpaceServiceResponse);
   rpc DeleteSpace(DeleteSpaceRequest) returns (SpaceServiceResponse);
   rpc GetSpace(GetSpaceRequest) returns (GetSpaceResponse);

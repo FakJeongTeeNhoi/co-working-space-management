@@ -2,6 +2,8 @@ package gRPC
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	pb "github.com/FakJeongTeeNhoi/co-working-space-management/generated/space"
 	"github.com/FakJeongTeeNhoi/co-working-space-management/model"
@@ -22,6 +24,122 @@ func ToSpace(req *pb.EditSpaceRequest, space *model.Space) {
 	space.FacultyAccessList = req.FacultyAccessList
 	space.RoomList = req.RoomList
 	space.IsAvailable = req.IsAvailable
+}
+
+func validateCreateSpaceRequest(req *pb.CreateSpaceRequest) error {
+	if req.Name == "" {
+		return errors.New("name is required")
+	}
+	if len(req.WorkingHours) == 0 {
+		return errors.New("working hours are required")
+	}
+	if req.Latitude < -90 || req.Latitude > 90 {
+		return errors.New("latitude must be between -90 and 90")
+	}
+	if req.Longitude < -180 || req.Longitude > 180 {
+		return errors.New("longitude must be between -180 and 180")
+	}
+	if req.Faculty == "" {
+		return errors.New("faculty is required")
+	}
+	if req.Floor <= 0 {
+		return errors.New("floor must be greater than 0")
+	}
+	if req.Building == "" {
+		return errors.New("building is required")
+	}
+	if req.Type == "" {
+		return errors.New("type is required")
+	}
+	if req.HeadStaff == "" {
+		return errors.New("head staff is required")
+	}
+	if len(req.FacultyAccessList) == 0 {
+		return errors.New("faculty access list is required")
+	}
+	if len(req.RoomList) == 0 {
+		return errors.New("room list is required")
+	}
+	if !req.IsAvailable {
+		return errors.New("availability status must be true")
+	}
+	return nil
+}
+
+func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceRequest) (*pb.SpaceServiceResponse, error) {
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err() // Return the context error if cancelled
+	default:
+	}
+
+	// Proceed with validation and space creation
+	if err := validateCreateSpaceRequest(req); err != nil {
+		return &pb.SpaceServiceResponse{Success: false, Message: err.Error()}, err
+	}
+
+	// Create a new space object to save in the database
+	var space model.Space
+
+	space.Name = req.Name
+	space.Description = req.Description
+	space.WorkingHour = req.WorkingHours
+	space.Latitude = float64(req.Latitude)
+	space.Longitude = float64(req.Longitude)
+	space.Faculty = req.Faculty
+	space.Floor = int(req.Floor)
+	space.Building = req.Building
+	space.Type = req.Type
+	space.HeadStaff = req.HeadStaff
+	space.FacultyAccessList = req.FacultyAccessList
+	space.RoomList = req.RoomList
+	space.IsAvailable = req.IsAvailable
+
+	// Log creation attempt
+	log.Printf("Attempting to create space: %v", space)
+
+	if err := s.db.Create(&space).Error; err != nil {
+		log.Printf("Failed to create space: %v", err)
+		return &pb.SpaceServiceResponse{Success: false, Message: "Failed to create Co-Working Space"}, err
+	}
+
+	// Log successful creation
+	log.Printf("Successfully created space: %v", space)
+
+	return &pb.SpaceServiceResponse{Success: true, Message: "Co-Working Space created successfully"}, nil
+}
+
+
+func (s *SpaceServer) GetAllSpace(ctx context.Context, req *pb.GetAllSpaceRequest) (*pb.GetAllSpaceResponse, error) {
+    var spaces []model.Space
+
+    // Retrieve all spaces from the database
+    if err := s.db.Find(&spaces).Error; err != nil {
+        return &pb.GetAllSpaceResponse{Success: false, Message: "Failed to get all Co-Working Spaces"}, err
+    }
+
+    // Convert the model spaces to protobuf spaces
+    var pbSpaces []*pb.Space
+    for _, space := range spaces {
+        pbSpace := &pb.Space{
+            Name:              space.Name,
+            Description:       space.Description,
+            WorkingHours:      space.WorkingHour,
+            Latitude:          float32(space.Latitude),
+            Longitude:         float32(space.Longitude),
+            Faculty:           space.Faculty,
+            Floor:             int64(space.Floor),
+            Building:          space.Building,
+            Type:              space.Type,
+            HeadStaff:         space.HeadStaff,
+            FacultyAccessList: space.FacultyAccessList,
+            RoomList:          space.RoomList,
+            IsAvailable:       space.IsAvailable,
+        }
+        pbSpaces = append(pbSpaces, pbSpace)
+    }
+
+    return &pb.GetAllSpaceResponse{Success: true, Message: "Spaces retrieved successfully", Spaces: pbSpaces}, nil
 }
 
 func (s *SpaceServer) EditSpaceDetail(ctx context.Context, req *pb.EditSpaceRequest) (*pb.SpaceServiceResponse, error) {
