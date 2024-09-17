@@ -54,10 +54,10 @@ func validateCreateSpaceRequest(req *pb.CreateSpaceRequest) error {
 	return nil
 }
 
-func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceRequest) (*pb.SpaceServiceResponse, error) {
+func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceRequest) (*pb.GetSpaceResponse, error) {
 	// Proceed with validation and space creation
 	if err := validateCreateSpaceRequest(req); err != nil {
-		return &pb.SpaceServiceResponse{Success: false, Message: err.Error()}, err
+		return &pb.GetSpaceResponse{Success: false}, err
 	}
 
 	// Create a new space object to save in the database
@@ -83,13 +83,26 @@ func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceReques
 
 	if err := s.db.Create(&space).Error; err != nil {
 		log.Printf("Failed to create space: %v", err)
-		return &pb.SpaceServiceResponse{Success: false, Message: "Failed to create Co-Working Space"}, err
+		return &pb.GetSpaceResponse{Success: false}, err
 	}
 
-	// Log successful creation
-	log.Printf("Successfully created space: %v", space)
-
-	return &pb.SpaceServiceResponse{Success: true, Message: "Co-Working Space created successfully"}, nil
+	return &pb.GetSpaceResponse{
+		Success: true,
+		SpaceId: int64(space.ID),
+		Name: space.Name,
+		Description: space.Description,
+		WorkingHours: space.WorkingHour,
+		Latitude: float32(space.Latitude),
+		Longitude: float32(space.Longitude),
+		Faculty: space.Faculty,
+		Floor: int64(space.Floor),
+		Building: space.Building,
+		Type: space.Type,
+		HeadStaff: space.HeadStaff,
+		FacultyAccessList: space.FacultyAccessList,
+		RoomList: space.RoomList,
+		IsAvailable: space.IsAvailable,
+	}, nil
 }
 
 

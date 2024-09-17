@@ -96,7 +96,7 @@ message DeleteSpaceRequest {
 }
 
 service SpaceService {
-  rpc CreateSpace(CreateSpaceRequest) returns (SpaceServiceResponse);
+  rpc CreateSpace(CreateSpaceRequest) returns (GetSpaceResponse);
   rpc GetAllSpace(GetAllSpaceRequest) returns (GetAllSpaceResponse);
   rpc EditSpaceDetail(EditSpaceRequest) returns (SpaceServiceResponse);
   rpc DeleteSpace(DeleteSpaceRequest) returns (SpaceServiceResponse);

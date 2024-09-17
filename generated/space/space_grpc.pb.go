@@ -30,7 +30,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SpaceServiceClient interface {
-	CreateSpace(ctx context.Context, in *CreateSpaceRequest, opts ...grpc.CallOption) (*SpaceServiceResponse, error)
+	CreateSpace(ctx context.Context, in *CreateSpaceRequest, opts ...grpc.CallOption) (*GetSpaceResponse, error)
 	GetAllSpace(ctx context.Context, in *GetAllSpaceRequest, opts ...grpc.CallOption) (*GetAllSpaceResponse, error)
 	EditSpaceDetail(ctx context.Context, in *EditSpaceRequest, opts ...grpc.CallOption) (*SpaceServiceResponse, error)
 	DeleteSpace(ctx context.Context, in *DeleteSpaceRequest, opts ...grpc.CallOption) (*SpaceServiceResponse, error)
@@ -45,9 +45,9 @@ func NewSpaceServiceClient(cc grpc.ClientConnInterface) SpaceServiceClient {
 	return &spaceServiceClient{cc}
 }
 
-func (c *spaceServiceClient) CreateSpace(ctx context.Context, in *CreateSpaceRequest, opts ...grpc.CallOption) (*SpaceServiceResponse, error) {
+func (c *spaceServiceClient) CreateSpace(ctx context.Context, in *CreateSpaceRequest, opts ...grpc.CallOption) (*GetSpaceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SpaceServiceResponse)
+	out := new(GetSpaceResponse)
 	err := c.cc.Invoke(ctx, SpaceService_CreateSpace_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (c *spaceServiceClient) GetSpace(ctx context.Context, in *GetSpaceRequest, 
 // All implementations must embed UnimplementedSpaceServiceServer
 // for forward compatibility.
 type SpaceServiceServer interface {
-	CreateSpace(context.Context, *CreateSpaceRequest) (*SpaceServiceResponse, error)
+	CreateSpace(context.Context, *CreateSpaceRequest) (*GetSpaceResponse, error)
 	GetAllSpace(context.Context, *GetAllSpaceRequest) (*GetAllSpaceResponse, error)
 	EditSpaceDetail(context.Context, *EditSpaceRequest) (*SpaceServiceResponse, error)
 	DeleteSpace(context.Context, *DeleteSpaceRequest) (*SpaceServiceResponse, error)
@@ -114,7 +114,7 @@ type SpaceServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSpaceServiceServer struct{}
 
-func (UnimplementedSpaceServiceServer) CreateSpace(context.Context, *CreateSpaceRequest) (*SpaceServiceResponse, error) {
+func (UnimplementedSpaceServiceServer) CreateSpace(context.Context, *CreateSpaceRequest) (*GetSpaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSpace not implemented")
 }
 func (UnimplementedSpaceServiceServer) GetAllSpace(context.Context, *GetAllSpaceRequest) (*GetAllSpaceResponse, error) {
