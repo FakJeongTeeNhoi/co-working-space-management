@@ -15,9 +15,10 @@ message CreateSpaceRequest {
   string building = 8;
   string type = 9;
   string head_staff = 10;
-  repeated string faculty_access_list = 11;
-  repeated string room_list = 12;
-  bool is_available = 13;
+  repeated int64 staff_list = 11;
+  repeated string faculty_access_list = 12;
+  repeated string room_list = 13;
+  bool is_available = 14;
 }
 
 message GetAllSpaceRequest {}
@@ -34,9 +35,10 @@ message Space {
   string building = 9;
   string type = 10;
   string head_staff = 11;
-  repeated string faculty_access_list = 12;
-  repeated string room_list = 13;
-  bool is_available = 14;
+  repeated int64 staff_list = 12;
+  repeated string faculty_access_list = 13;
+  repeated string room_list = 14;
+  bool is_available = 15;
 }
 
 message GetAllSpaceResponse {

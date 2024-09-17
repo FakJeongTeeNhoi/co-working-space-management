@@ -30,9 +30,6 @@ func validateCreateSpaceRequest(req *pb.CreateSpaceRequest) error {
 	if req.Name == "" {
 		return errors.New("name is required")
 	}
-	if len(req.WorkingHours) == 0 {
-		return errors.New("working hours are required")
-	}
 	if req.Latitude < -90 || req.Latitude > 90 {
 		return errors.New("latitude must be between -90 and 90")
 	}
@@ -51,28 +48,13 @@ func validateCreateSpaceRequest(req *pb.CreateSpaceRequest) error {
 	if req.Type == "" {
 		return errors.New("type is required")
 	}
-	if req.HeadStaff == "" {
-		return errors.New("head staff is required")
-	}
-	if len(req.FacultyAccessList) == 0 {
-		return errors.New("faculty access list is required")
-	}
-	if len(req.RoomList) == 0 {
-		return errors.New("room list is required")
-	}
 	if !req.IsAvailable {
-		return errors.New("availability status must be true")
+		return errors.New("availability status is required")
 	}
 	return nil
 }
 
 func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceRequest) (*pb.SpaceServiceResponse, error) {
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err() // Return the context error if cancelled
-	default:
-	}
-
 	// Proceed with validation and space creation
 	if err := validateCreateSpaceRequest(req); err != nil {
 		return &pb.SpaceServiceResponse{Success: false, Message: err.Error()}, err
@@ -91,6 +73,7 @@ func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceReques
 	space.Building = req.Building
 	space.Type = req.Type
 	space.HeadStaff = req.HeadStaff
+	space.StaffList = req.StaffList
 	space.FacultyAccessList = req.FacultyAccessList
 	space.RoomList = req.RoomList
 	space.IsAvailable = req.IsAvailable
@@ -132,6 +115,7 @@ func (s *SpaceServer) GetAllSpace(ctx context.Context, req *pb.GetAllSpaceReques
             Building:          space.Building,
             Type:              space.Type,
             HeadStaff:         space.HeadStaff,
+			StaffList:         space.StaffList,
             FacultyAccessList: space.FacultyAccessList,
             RoomList:          space.RoomList,
             IsAvailable:       space.IsAvailable,
