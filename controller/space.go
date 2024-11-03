@@ -43,6 +43,7 @@ func DisplaySpaceInfo(c *gin.Context) {
 
 	spaceResponse := model.SpaceResponse{}
 	model.ToSpaceResponse(&space, &spaceResponse)
+	model.EmbeddedRoomList(&space, &spaceResponse, 0)
 
 	c.JSON(200, response.CommonResponse{
 		Success: true,

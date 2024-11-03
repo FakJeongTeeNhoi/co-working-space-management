@@ -72,6 +72,17 @@ func ToOpenDay(workingHour pq.StringArray) []string {
 	return opening_day
 }
 
+func EmbeddedRoomList(space *Space, spaceResponse *SpaceResponse, capacity int) error {
+	for _, room_name := range space.RoomList {
+		room := Room{}
+		room.GetOneRoom(map[string]interface{}{"name": room_name})
+		if room.Capacity >= capacity {
+			spaceResponse.RoomList = append(spaceResponse.RoomList, room)
+		}
+	}
+	return nil
+}
+
 func ToSpaceResponse(req *Space, res *SpaceResponse) {
 	res.ID = req.ID
 	res.Name = req.Name
@@ -135,19 +146,14 @@ func (s *SpaceResponses) GetAllWithSearchParam(params SpaceSearchParam) error {
 		temporary_space := SpaceResponse{}
 		// Get the rooms associated with the space
 		ToSpaceResponse(&space, &temporary_space)
-		for _, room_name := range space.RoomList {
-			room := Room{}
-			room.GetOneRoom(map[string]interface{}{"name": room_name})
-
-			if params.Capacity > 0 {
-				if room.Capacity >= params.Capacity {
-					temporary_space.RoomList = append(temporary_space.RoomList, room)
-				}
-			} else {
-				temporary_space.RoomList = append(temporary_space.RoomList, room)
-			}
+		if params.Capacity > 0 {
+			EmbeddedRoomList(&space, &temporary_space, params.Capacity)
+		} else {
+			EmbeddedRoomList(&space, &temporary_space, 0)
 		}
-		*s = append(*s, temporary_space)
+		if len(temporary_space.RoomList) > 0 {
+			*s = append(*s, temporary_space)
+		}
 	}
 
 	return result.Error
