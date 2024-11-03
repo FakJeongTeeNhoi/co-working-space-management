@@ -39,7 +39,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "3020:3020"
+      - "3030:3030"
       - "50051:50051"
     networks:
       - app

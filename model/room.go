@@ -11,3 +11,8 @@ type Room struct {
 	MinReserveCapacity int    `json:"min_reserve_capacity" gorm:"not null"`
 	IsAvailable        bool   `json:"is_available" gorm:"not null"`
 }
+
+func (s *Room) GetOneRoom(filter interface{}) error {
+	result := MainDB.Model(&Room{}).Where(filter).First(s)
+	return result.Error
+}

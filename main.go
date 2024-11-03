@@ -5,6 +5,7 @@ import (
 
 	"github.com/FakJeongTeeNhoi/co-working-space-management/gRPC"
 	"github.com/FakJeongTeeNhoi/co-working-space-management/model"
+	"github.com/FakJeongTeeNhoi/co-working-space-management/router"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -32,10 +33,11 @@ func main() {
 
 	server.Use(cors.New(corsConfig))
 
-	//api := server.Group("/api")
+	api := server.Group("/api")
 	// TODO: Add routes here
+	router.SpaceRouterGroup(api)
 
-	err = server.Run(":3020")
+	err = server.Run(":3030")
 	if err != nil {
 		panic(err)
 	}
