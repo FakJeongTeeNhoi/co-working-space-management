@@ -41,9 +41,12 @@ func DisplaySpaceInfo(c *gin.Context) {
 		return
 	}
 
+	spaceResponse := model.SpaceResponse{}
+	model.ToSpaceResponse(&space, &spaceResponse)
+
 	c.JSON(200, response.CommonResponse{
 		Success: true,
 	}.AddInterfaces(map[string]interface{}{
-		"space": space,
+		"space": spaceResponse,
 	}))
 }

@@ -82,57 +82,56 @@ func (s *SpaceServer) CreateSpace(ctx context.Context, req *pb.CreateSpaceReques
 	}
 
 	return &pb.GetSpaceResponse{
-		Success: true,
-		SpaceId: int64(space.ID),
-		Name: space.Name,
-		Description: space.Description,
-		WorkingHours: space.WorkingHour,
-		Latitude: float32(space.Latitude),
-		Longitude: float32(space.Longitude),
-		Faculty: space.Faculty,
-		Floor: int64(space.Floor),
-		Building: space.Building,
-		Type: space.Type,
-		HeadStaff: space.HeadStaff,
+		Success:           true,
+		SpaceId:           int64(space.ID),
+		Name:              space.Name,
+		Description:       space.Description,
+		WorkingHours:      space.WorkingHour,
+		Latitude:          float32(space.Latitude),
+		Longitude:         float32(space.Longitude),
+		Faculty:           space.Faculty,
+		Floor:             int64(space.Floor),
+		Building:          space.Building,
+		Type:              space.Type,
+		HeadStaff:         space.HeadStaff,
 		FacultyAccessList: space.FacultyAccessList,
-		RoomList: space.RoomList,
-		IsAvailable: space.IsAvailable,
+		RoomList:          space.RoomList,
+		IsAvailable:       space.IsAvailable,
 	}, nil
 }
 
-
 func (s *SpaceServer) GetAllSpace(ctx context.Context, req *pb.GetAllSpaceRequest) (*pb.GetAllSpaceResponse, error) {
-    var spaces []model.Space
+	var spaces []model.Space
 
-    // Retrieve all spaces from the database
-    if err := s.db.Find(&spaces).Error; err != nil {
-        return &pb.GetAllSpaceResponse{Success: false, Message: "Failed to get all Co-Working Spaces"}, err
-    }
+	// Retrieve all spaces from the database
+	if err := s.db.Find(&spaces).Error; err != nil {
+		return &pb.GetAllSpaceResponse{Success: false, Message: "Failed to get all Co-Working Spaces"}, err
+	}
 
-    // Convert the model spaces to protobuf spaces
-    var pbSpaces []*pb.Space
-    for _, space := range spaces {
-        pbSpace := &pb.Space{
-			SpaceId: 		   int64(space.ID),
-            Name:              space.Name,
-            Description:       space.Description,
-            WorkingHours:      space.WorkingHour,
-            Latitude:          float32(space.Latitude),
-            Longitude:         float32(space.Longitude),
-            Faculty:           space.Faculty,
-            Floor:             int64(space.Floor),
-            Building:          space.Building,
-            Type:              space.Type,
-            HeadStaff:         space.HeadStaff,
+	// Convert the model spaces to protobuf spaces
+	var pbSpaces []*pb.Space
+	for _, space := range spaces {
+		pbSpace := &pb.Space{
+			SpaceId:           int64(space.ID),
+			Name:              space.Name,
+			Description:       space.Description,
+			WorkingHours:      space.WorkingHour,
+			Latitude:          float32(space.Latitude),
+			Longitude:         float32(space.Longitude),
+			Faculty:           space.Faculty,
+			Floor:             int64(space.Floor),
+			Building:          space.Building,
+			Type:              space.Type,
+			HeadStaff:         space.HeadStaff,
 			StaffList:         space.StaffList,
-            FacultyAccessList: space.FacultyAccessList,
-            RoomList:          space.RoomList,
-            IsAvailable:       space.IsAvailable,
-        }
-        pbSpaces = append(pbSpaces, pbSpace)
-    }
+			FacultyAccessList: space.FacultyAccessList,
+			RoomList:          space.RoomList,
+			IsAvailable:       space.IsAvailable,
+		}
+		pbSpaces = append(pbSpaces, pbSpace)
+	}
 
-    return &pb.GetAllSpaceResponse{Success: true, Message: "Spaces retrieved successfully", Spaces: pbSpaces}, nil
+	return &pb.GetAllSpaceResponse{Success: true, Message: "Spaces retrieved successfully", Spaces: pbSpaces}, nil
 }
 
 func (s *SpaceServer) EditSpaceDetail(ctx context.Context, req *pb.EditSpaceRequest) (*pb.SpaceServiceResponse, error) {
@@ -171,20 +170,20 @@ func (s *SpaceServer) GetSpace(ctx context.Context, req *pb.GetSpaceRequest) (*p
 	}
 
 	return &pb.GetSpaceResponse{
-		Success: true,
-		SpaceId: int64(space.ID),  // Include space_id in the response
-		Name: space.Name,
-		Description: space.Description,
-		WorkingHours: space.WorkingHour,
-		Latitude: float32(space.Latitude),
-		Longitude: float32(space.Longitude),
-		Faculty: space.Faculty,
-		Floor: int64(space.Floor),
-		Building: space.Building,
-		Type: space.Type,
-		HeadStaff: space.HeadStaff,
+		Success:           true,
+		SpaceId:           int64(space.ID), // Include space_id in the response
+		Name:              space.Name,
+		Description:       space.Description,
+		WorkingHours:      space.WorkingHour,
+		Latitude:          float32(space.Latitude),
+		Longitude:         float32(space.Longitude),
+		Faculty:           space.Faculty,
+		Floor:             int64(space.Floor),
+		Building:          space.Building,
+		Type:              space.Type,
+		HeadStaff:         space.HeadStaff,
 		FacultyAccessList: space.FacultyAccessList,
-		RoomList: space.RoomList,
-		IsAvailable: space.IsAvailable,
+		RoomList:          space.RoomList,
+		IsAvailable:       space.IsAvailable,
 	}, nil
 }

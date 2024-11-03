@@ -32,6 +32,7 @@ type SpaceResponse struct {
 	gorm.Model
 	Name              string         `json:"name"`
 	Description       string         `json:"description"`
+	Opening_day       []string       `json:"opening_day"`
 	WorkingHour       pq.StringArray `json:"working_hour"`
 	Latitude          float64        `json:"latitude"`
 	Longitude         float64        `json:"longitude"`
@@ -61,10 +62,21 @@ func (s *Space) GetOne(filter interface{}) error {
 	return result.Error
 }
 
+func ToOpenDay(workingHour pq.StringArray) []string {
+	opening_day := []string{}
+	for i, working_hour := range workingHour {
+		if working_hour != "Closed" {
+			opening_day = append(opening_day, time.Weekday(i).String())
+		}
+	}
+	return opening_day
+}
+
 func ToSpaceResponse(req *Space, res *SpaceResponse) {
 	res.ID = req.ID
 	res.Name = req.Name
 	res.Description = req.Description
+	res.Opening_day = ToOpenDay(req.WorkingHour)
 	res.WorkingHour = req.WorkingHour
 	res.Latitude = req.Latitude
 	res.Longitude = req.Longitude
@@ -94,7 +106,7 @@ func (s *SpaceResponses) GetAllWithSearchParam(params SpaceSearchParam) error {
 	dayOfWeek := params.Start_datetime.Weekday() // returns a value from 0 (Sunday) to 6 (Saturday)
 
 	// Get the corresponding working hour string for that day
-	workingHourColumn := fmt.Sprintf("working_hour[%d]", dayOfWeek+1) // GORM uses 1-based indexing for PostgreSQL arrays
+	workingHourColumn := fmt.Sprintf("working_hour[%d]", dayOfWeek) // GORM uses 1-based indexing for PostgreSQL arrays
 
 	if !params.Start_datetime.IsZero() && !params.End_datetime.IsZero() {
 		// Prepare the time range to compare with the working hours
