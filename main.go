@@ -37,7 +37,7 @@ func main() {
 	// TODO: Add routes here
 	router.SpaceRouterGroup(api)
 
-	err = server.Run(":3020")
+	err = server.Run(":3030")
 	if err != nil {
 		panic(err)
 	}
