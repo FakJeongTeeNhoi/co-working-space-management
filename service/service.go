@@ -53,3 +53,7 @@ func ParseToFloat64(s string) float64 {
 	}
 	return f
 }
+
+func ParsToString(i int) string {
+	return strconv.Itoa(i)
+}

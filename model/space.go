@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/FakJeongTeeNhoi/co-working-space-management/service"
 	"github.com/lib/pq"
 	gorm "gorm.io/gorm"
 )
@@ -25,6 +26,22 @@ type Space struct {
 	StaffList         pq.Int64Array  `json:"staff_list" gorm:"type:integer[]"`
 	RoomList          pq.StringArray `json:"room_list" gorm:"type:text[]"`
 	IsAvailable       bool           `json:"is_available" gorm:"not null"`
+}
+
+type CreateSpaceRequest struct {
+	Name              string         `json:"name" binding:"required"`
+	Description       string         `json:"description"`
+	WorkingHour       pq.StringArray `json:"working_hour" binding:"required"`
+	Latitude          float64        `json:"latitude" binding:"required"`
+	Longitude         float64        `json:"longitude" binding:"required"`
+	Faculty           string         `json:"faculty" binding:"required"`
+	Floor             int            `json:"floor" binding:"required"`
+	Building          string         `json:"building" binding:"required"`
+	Type              string         `json:"type" binding:"required"`
+	HeadStaff         string         `json:"head_staff"`
+	FacultyAccessList pq.StringArray `json:"faculty_access_list"`
+	StaffList         pq.Int64Array  `json:"staff_list"`
+	RoomList          pq.StringArray `json:"room_list"`
 }
 
 type SpaceResponses []SpaceResponse
@@ -80,6 +97,13 @@ func EmbeddedRoomList(space *Space, spaceResponse *SpaceResponse, capacity int) 
 			spaceResponse.RoomList = append(spaceResponse.RoomList, room)
 		}
 	}
+	return nil
+}
+
+func EmbeddedRoomListWithSpace(space *Space, spaceResponse *SpaceResponse, ID uint) error {
+	room := Room{}
+	room.GetOneRoom(map[string]interface{}{"id": ID})
+	spaceResponse.RoomList = append(spaceResponse.RoomList, room)
 	return nil
 }
 
@@ -156,5 +180,104 @@ func (s *SpaceResponses) GetAllWithSearchParam(params SpaceSearchParam) error {
 		}
 	}
 
+	return result.Error
+}
+
+func (s *CreateSpaceRequest) CreateSpace() (*SpaceResponse, error) {
+	space := Space{
+		Name:              s.Name,
+		Description:       s.Description,
+		WorkingHour:       s.WorkingHour,
+		Latitude:          s.Latitude,
+		Longitude:         s.Longitude,
+		Faculty:           s.Faculty,
+		Floor:             s.Floor,
+		Building:          s.Building,
+		Type:              s.Type,
+		HeadStaff:         s.HeadStaff,
+		FacultyAccessList: s.FacultyAccessList,
+		StaffList:         s.StaffList,
+		RoomList:          s.RoomList,
+		IsAvailable:       true,
+	}
+	result := MainDB.Model(&Space{}).Create(&space)
+	spaceResponse := SpaceResponse{}
+	ToSpaceResponse(&space, &spaceResponse)
+	return &spaceResponse, result.Error
+}
+
+func (s *Space) UpdateSpace(filter interface{}) error {
+	result := MainDB.Model(&Space{}).Where(filter).Updates(s)
+	return result.Error
+}
+
+type AddStaffToSpaceRequest struct {
+	StaffIDs []int `json:"staff_id" binding:"required"`
+}
+
+func (s *AddStaffToSpaceRequest) AddStaffToSpace(spaceID int) error {
+	space := Space{}
+	space.GetOne(map[string]interface{}{"id": spaceID})
+	for _, staffID := range s.StaffIDs {
+		space.StaffList = append(space.StaffList, int64(staffID))
+	}
+	result := MainDB.Model(&Space{}).Where("id = ?", spaceID).Updates(&space)
+	return result.Error
+}
+
+type RemoveStaffFromSpaceRequest struct {
+	StaffIDs []int `json:"staff_id" binding:"required"`
+}
+
+func (s *RemoveStaffFromSpaceRequest) RemoveStaffFromSpace(spaceID int) error {
+	space := Space{}
+	space.GetOne(map[string]interface{}{"id": spaceID})
+	for _, staffID := range s.StaffIDs {
+		for i, staff := range space.StaffList {
+			if staff == int64(staffID) {
+				space.StaffList = append(space.StaffList[:i], space.StaffList[i+1:]...)
+			}
+		}
+	}
+	result := MainDB.Model(&Space{}).Where("id = ?", spaceID).Updates(&space)
+	return result.Error
+}
+
+type AddRoomToSpaceRequest struct {
+	RoomList []int `json:"room_list" binding:"required"`
+}
+
+func (s *AddRoomToSpaceRequest) AddRoomToSpace(spaceID int) error {
+	space := Space{}
+	space.GetOne(map[string]interface{}{"id": spaceID})
+	for _, room := range s.RoomList {
+		space.RoomList = append(space.RoomList, service.ParsToString(room))
+		fmt.Println(string(room))
+		fmt.Println(room)
+	}
+	result := MainDB.Model(&Space{}).Where("id = ?", spaceID).Updates(&space)
+	return result.Error
+}
+
+type RemoveRoomFromSpaceRequest struct {
+	RoomList []int `json:"room_list" binding:"required"`
+}
+
+func (s *RemoveRoomFromSpaceRequest) RemoveRoomFromSpace(spaceID int) error {
+	space := Space{}
+	space.GetOne(map[string]interface{}{"id": spaceID})
+	for _, room := range s.RoomList {
+		for i, room_name := range space.RoomList {
+			if room_name == string(room) {
+				space.RoomList = append(space.RoomList[:i], space.RoomList[i+1:]...)
+			}
+		}
+	}
+	result := MainDB.Model(&Space{}).Where("id = ?", spaceID).Updates(&space)
+	return result.Error
+}
+
+func (s *Space) GetOneWithRoomInfo(roomID string) error {
+	result := MainDB.Model(&Space{}).Where("room_list @> ARRAY[?]::text[]", roomID).First(s)
 	return result.Error
 }
