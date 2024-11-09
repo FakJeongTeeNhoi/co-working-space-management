@@ -3,9 +3,11 @@ package gRPC
 import (
 	"context"
 	"errors"
+	"time"
 
 	pb "github.com/FakJeongTeeNhoi/co-working-space-management/generated/space"
 	"github.com/FakJeongTeeNhoi/co-working-space-management/model"
+	"github.com/FakJeongTeeNhoi/co-working-space-management/service"
 	"gorm.io/gorm"
 )
 
@@ -23,6 +25,30 @@ func ToSpace(req *pb.EditSpaceRequest, space *model.Space) {
 	space.FacultyAccessList = req.FacultyAccessList
 	space.RoomList = req.RoomList
 	space.IsAvailable = req.IsAvailable
+}
+
+func convertToRoomResponseList(rooms []model.Room) []*pb.RoomResponse {
+	var roomResponses []*pb.RoomResponse
+	for _, room := range rooms {
+		roomResponses = append(roomResponses, &pb.RoomResponse{
+			ID:   int64(room.ID),
+			CreatedAt: room.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: room.UpdatedAt.Format(time.RFC3339),
+			DeletedAt: func() string {
+				if room.DeletedAt.Valid {
+					return room.DeletedAt.Time.Format(time.RFC3339)
+				}
+				return ""
+			}(),
+			Name:     room.Name,
+			Description: room.Description,
+			RoomNumber: room.RoomNumber,
+			Capacity: int64(room.Capacity),
+			MinReserveCapacity: int64(room.MinReserveCapacity),
+			IsAvailable: room.IsAvailable,
+		})
+	}
+	return roomResponses
 }
 
 func validateCreateSpaceRequest(req *pb.CreateSpaceRequest) error {
@@ -185,5 +211,45 @@ func (s *SpaceServer) GetSpace(ctx context.Context, req *pb.GetSpaceRequest) (*p
 		FacultyAccessList: space.FacultyAccessList,
 		RoomList:          space.RoomList,
 		IsAvailable:       space.IsAvailable,
+	}, nil
+}
+
+func (s *SpaceServer) DisplaySpaceWithRoomInfo(ctx context.Context, req *pb.DisplaySpaceWithRoomInfoRequest) (*pb.SpaceWithRoomInfoResponse, error) {
+	space := model.Space{}
+	if err := space.GetOneWithRoomInfo(service.ParsToString(int(req.Id))); err != nil {
+		return &pb.SpaceWithRoomInfoResponse{Success: false}, err
+	}
+	spaceResponse := model.SpaceResponse{}
+	model.ToSpaceResponse(&space, &spaceResponse)
+	model.EmbeddedRoomListWithSpace(&space, &spaceResponse, uint(req.Id))
+
+	// Return a successful response with the populated space data
+	return &pb.SpaceWithRoomInfoResponse{
+		Space:   &pb.SpaceResponse{
+			ID:           	   int64(spaceResponse.ID),
+			CreatedAt: 	   	   spaceResponse.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: 	   	   spaceResponse.UpdatedAt.Format(time.RFC3339),
+			DeletedAt:         func() string {
+				if spaceResponse.DeletedAt.Valid {
+					return spaceResponse.DeletedAt.Time.Format(time.RFC3339)
+				}
+				return ""
+			}(),
+			Name:              spaceResponse.Name,
+			OpeningDay: 	   spaceResponse.Opening_day,
+			WorkingHour:       spaceResponse.WorkingHour,
+			Latitude:          spaceResponse.Latitude,
+			Longitude:         spaceResponse.Longitude,
+			Faculty:           spaceResponse.Faculty,
+			Floor:             int64(spaceResponse.Floor),
+			Building:          spaceResponse.Building,
+			Type:              spaceResponse.Type,
+			HeadStaff:         spaceResponse.HeadStaff,
+			FacultyAccessList: spaceResponse.FacultyAccessList,
+			StaffList: 	       spaceResponse.StaffList,
+			RoomList:          convertToRoomResponseList(spaceResponse.RoomList),
+			IsAvailable:       spaceResponse.IsAvailable,
+		},
+		Success: true,
 	}, nil
 }
