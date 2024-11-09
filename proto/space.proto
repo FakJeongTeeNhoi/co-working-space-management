@@ -95,10 +95,55 @@ message DeleteSpaceRequest {
   int64 space_id = 1;
 }
 
+message DisplaySpaceWithRoomInfoRequest {
+  int64 id = 1;
+}
+
+message RoomResponse {
+  int64 ID = 1;
+  string CreatedAt = 2;
+  string UpdatedAt = 3;
+  string DeletedAt = 4;
+  string name = 5;
+  string description = 6;
+  string room_number = 7;
+  int64 capacity = 8;
+  int64 min_reserve_capacity = 9;
+  bool is_available = 10;
+}
+
+message SpaceResponse {
+  int64 ID = 1;
+  string CreatedAt = 2;
+  string UpdatedAt = 3;
+  string DeletedAt = 4;
+  string name = 5;
+  string description = 6;
+  repeated string opening_day = 7;
+  repeated string working_hour = 8;
+  double latitude = 9;
+  double longitude = 10;
+  string faculty = 11;
+  int64 floor = 12;
+  string building = 13;
+  string type = 14;
+  string head_staff = 15;
+  repeated string faculty_access_list = 16;
+  repeated int64 staff_list = 17;
+  repeated RoomResponse room_list = 18;
+  bool is_available = 19;
+}
+
+message SpaceWithRoomInfoResponse {
+  SpaceResponse space = 1;
+  bool success = 2;
+}
+
 service SpaceService {
   rpc CreateSpace(CreateSpaceRequest) returns (GetSpaceResponse);
   rpc GetAllSpace(GetAllSpaceRequest) returns (GetAllSpaceResponse);
   rpc EditSpaceDetail(EditSpaceRequest) returns (SpaceServiceResponse);
   rpc DeleteSpace(DeleteSpaceRequest) returns (SpaceServiceResponse);
   rpc GetSpace(GetSpaceRequest) returns (GetSpaceResponse);
+  rpc DisplaySpaceWithRoomInfo(DisplaySpaceWithRoomInfoRequest) returns (SpaceWithRoomInfoResponse);
 }
