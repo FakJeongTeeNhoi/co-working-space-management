@@ -52,6 +52,22 @@ func DisplaySpaceInfo(c *gin.Context) {
 	}))
 }
 
+func DisplayAllSpace(c *gin.Context) {
+	id := c.GetHeader("account_id")
+	spaces := model.SpaceResponses{}
+	if err := spaces.GetAll(service.ParseToInt64(id)); err != nil {
+		response.NotFound("Space not found").AbortWithError(c)
+		return
+	}
+
+	c.JSON(200, response.CommonResponse{
+		Success: true,
+	}.AddInterfaces(map[string]interface{}{
+		"count": len(spaces),
+		"space": spaces,
+	}))
+}
+
 func CreateSpace(c *gin.Context) {
 	spaceRequest := model.CreateSpaceRequest{}
 	if err := c.ShouldBindJSON(&spaceRequest); err != nil {

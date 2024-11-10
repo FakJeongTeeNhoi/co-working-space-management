@@ -23,6 +23,15 @@ func ParseToInt(s string) int {
 	return i
 }
 
+func ParseToInt64(s string) int64 {
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		log.Println("Failed to parse string to int64: ", err)
+	}
+	return i
+}
+
+
 func ParseToTime(s string) time.Time {
 	t, err := time.Parse(time.RFC3339, s)
 	if err != nil {
